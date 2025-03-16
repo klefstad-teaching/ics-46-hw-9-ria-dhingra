@@ -21,21 +21,23 @@ bool edit_distance_within(const string& str1, const string& str2, int d) {
                 if(diff > d) {return false;}
             }
         }
+        return diff <= d;
     }
     else {
-        string longer = length1 > length2 ? str1 : str2;
-        string shorter = length1 < length2 ? str1 : str2;
+        const string& longer = (length1 > length2) ? str1 : str2;
+        const string& shorter = (length1 < length2) ? str1 : str2;
         
-        for (int i = 0, j = 0; i < longer.size(); ++i) {
+        int i = 0, j = 0;
+        while(i < longer.size()) {
             if (j < shorter.size() && longer[i] == shorter[j]) {
                 ++j;
             } 
             else {
                 ++diff;
-                if (diff > d) return false;
-            }  
+                if (diff > d) {return false;}
+            }
+            ++i;
         }
-        diff += abs(length1 - length2);
     }
     return diff <= d;
 }
@@ -94,7 +96,7 @@ void print_word_ladder(const vector<string>& ladder) {
 #define my_assert(e) {cout << #e << ((e) ? " passed": " failed") << endl;}
 void verify_word_ladder() {
     set<string> word_list;
-    load_words(word_list, "src/words.txt");
+    load_words(word_list, "words.txt");
     my_assert(generate_word_ladder("cat", "dog", word_list).size() == 4);
     my_assert(generate_word_ladder("marty", "curls", word_list).size() == 6);
     my_assert(generate_word_ladder("code", "data", word_list).size() == 6);
