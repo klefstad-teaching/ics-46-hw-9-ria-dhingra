@@ -7,39 +7,41 @@ void error(string word1, string word2, string msg) {
     cerr << msg << ": " << word1 << " -> " << word2 << endl;
 }
 
-bool edit_distance_within(const std::string& str1, const std::string& str2, int d) {
-    int length1 = str1.length();
-    int length2 = str2.length();
+bool edit_distance_within(const string& str1, const string& str2, int d) {
+    int length1 = str1.size();
+    int length2 = str2.size();
 
-    if(abs(length1 - length2) > d) {
-        return false;
-    }
+    if (abs(length1 - length2) > d){return false;}
 
     int diff = 0;
-    for(size_t i = 0; i < length1; ++i) {
-        if(str1[i] != str2[i]) {
-            diff++;
-            if(diff > d) {
-                return false;
+    if (length1 == length2) {
+        for (int i = 0; i < length1; ++i) {
+            if (str1[i] != str2[i]) {
+                ++diff;
+                if(diff > d) {return false;}
             }
         }
     }
-
-    diff += abs(length1 - length2);
+    else {
+        string longer = length1 > length2 ? str1 : str2;
+        string shorter = length1 < length2 ? str1 : str2;
+        
+        for (int i = 0, j = 0; i < longer.size(); ++i) {
+            if (j < shorter.size() && longer[i] == shorter[j]) {
+                ++j;
+            } 
+            else {
+                ++diff;
+                if (diff > d) return false;
+            }  
+        }
+        diff += abs(length1 - length2);
+    }
     return diff <= d;
 }
 
 bool is_adjacent(const string& word1, const string& word2) {
-    if (word1.length() != word2.length()) {return false;}  
-
-    int diff = 0;
-    for (size_t i = 0; i < word1.length(); i++) {
-        if (word1[i] != word2[i]) {
-            diff++;
-            if (diff > 1) {return false;}
-        }
-    }
-    return diff == 1;
+    return edit_distance_within(word1, word2, 1);
 }
 
 vector<string> generate_word_ladder(const string& begin_word, const string& end_word, const set<string>& word_list) {
@@ -92,7 +94,7 @@ void print_word_ladder(const vector<string>& ladder) {
 #define my_assert(e) {cout << #e << ((e) ? " passed": " failed") << endl;}
 void verify_word_ladder() {
     set<string> word_list;
-    load_words(word_list, "words.txt");
+    load_words(word_list, "src/words.txt");
     my_assert(generate_word_ladder("cat", "dog", word_list).size() == 4);
     my_assert(generate_word_ladder("marty", "curls", word_list).size() == 6);
     my_assert(generate_word_ladder("code", "data", word_list).size() == 6);
